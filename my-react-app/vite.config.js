@@ -7,4 +7,14 @@ export default defineConfig({
   plugins: [react(),
     tailwindcss(),
   ],
+  server: {
+    proxy: {
+      '/api-ei': {
+        target: 'https://api.estateintel.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api-ei/, ''),
+      },
+    },
+  },
 })
+
