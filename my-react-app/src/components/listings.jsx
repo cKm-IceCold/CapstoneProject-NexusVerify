@@ -44,9 +44,9 @@ function ListingCard({ item }) {
         <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
         {/* The Teal "Wave" or Banner from your design */}
         <div className="absolute bottom-0 w-full h-12 bg-[#4FD1C5] opacity-90 flex items-center justify-center">
-            <div className="w-8 h-8 border-2 border-white rounded-full flex items-center justify-center">
-                <span className="text-white text-[8px]">NEXUS</span>
-            </div>
+          <div className="w-8 h-8 border-2 border-white rounded-full flex items-center justify-center">
+            <span className="text-white text-[8px]">NEXUS</span>
+          </div>
         </div>
       </div>
 
@@ -54,9 +54,9 @@ function ListingCard({ item }) {
       <div className="p-6 w-full">
         <h3 className="font-bold text-lg text-gray-900 uppercase">{item.title}</h3>
         <p className="text-gray-600 font-bold mt-1 uppercase text-sm">PRICE: ${item.price}</p>
-        
+
         <p className="text-[#3182CE] font-bold text-xl mt-2">${item.price}</p>
-        
+
         <p className="text-gray-400 text-xs mt-4 leading-relaxed px-4">
           Verified property listing with accurate market data and document checks.
         </p>
@@ -65,7 +65,7 @@ function ListingCard({ item }) {
       {/* Agent Info */}
       <div className="mt-4 flex flex-col items-center">
         <div className="w-20 h-20 rounded-full border-4 border-[#4FD1C5] overflow-hidden p-1">
-            <img src={item.agentImg} alt={item.agent} className="w-full h-full rounded-full object-cover" />
+          <img src={item.agentImg} alt={item.agent} className="w-full h-full rounded-full object-cover" />
         </div>
         <p className="font-bold text-gray-800 mt-2 uppercase text-sm tracking-widest">{item.agent}</p>
       </div>
@@ -73,10 +73,10 @@ function ListingCard({ item }) {
       {/* Footer Verified Section */}
       <div className="mt-4 w-full px-6">
         <div className="bg-[#E6FFFA] py-2 rounded-full flex items-center justify-center gap-2">
-            <div className="bg-[#1A202C] rounded-full p-1">
-                <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
-            </div>
-            <span className="text-[#2C7A7B] text-[10px] font-bold uppercase tracking-tighter">Verified</span>
+          <div className="bg-[#1A202C] rounded-full p-1">
+            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
+          </div>
+          <span className="text-[#2C7A7B] text-[10px] font-bold uppercase tracking-tighter">Verified</span>
         </div>
       </div>
     </div>
@@ -85,7 +85,7 @@ function ListingCard({ item }) {
 
 function ListingsPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#B2F5EA] to-[#F7FAFC]">
+    <div className="min-h-screen bg-gradient-to-b from-[#B2F5EA] to-[#F7FAFC] pt-24">
       <div className="max-w-7xl mx-auto px-4 py-12">
         {/* Header */}
         <div className="text-center mb-12">

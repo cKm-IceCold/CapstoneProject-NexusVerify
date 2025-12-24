@@ -7,11 +7,13 @@ import LandingPage from './components/LandingPage';
 import Login from './components/login';
 import AuditorDashboard from './components/auditor';
 import VerifyPage from './components/verify';
+import Navbar from './components/navBar';
 
 function App() {
   return (
     <AuthProvider>
       <Router>
+        <Navbar />
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/How It Works" element={<HowItWorks />} />
