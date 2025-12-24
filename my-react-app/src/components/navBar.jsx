@@ -10,6 +10,14 @@ function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const { user, logout } = useAuth();
 
+  const handleHomeClick = (e) => {
+    if (window.location.pathname === '/') {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    setIsOpen(false);
+  };
+
   return (
     <header className="fixed top-0 left-0 w-full z-50 bg-white/90 backdrop-blur-sm shadow-sm">
       <nav className="font-medium max-w-7xl mx-auto px-4 md:px-10">
@@ -31,13 +39,13 @@ function Navbar() {
 
           {/* DESKTOP LINKS */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="hover:text-blue-600 transition-transform hover:scale-110">Home</Link>
+            <Link to="/" onClick={handleHomeClick} className="hover:text-blue-600 transition-transform hover:scale-110">Home</Link>
             <Link to="/How It Works" className="hover:text-blue-600 transition-transform hover:scale-110">How It Works</Link>
             <Link to="/Listings" className="hover:text-blue-600 transition-transform hover:scale-110">Listings</Link>
           </div>
 
           {/* LOGO */}
-          <Link to="/">
+          <Link to="/" onClick={handleHomeClick}>
             <img
               src={Logo}
               alt="Logo"
@@ -75,7 +83,7 @@ function Navbar() {
         {/* MOBILE MENU DROPDOWN */}
         <div className={`${isOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'} md:hidden overflow-hidden transition-all duration-300 ease-in-out bg-white border-t`}>
           <div className="flex flex-col space-y-4 p-6">
-            <Link to="/" onClick={() => setIsOpen(false)} className="text-lg border-b pb-2">Home</Link>
+            <Link to="/" onClick={handleHomeClick} className="text-lg border-b pb-2">Home</Link>
             <Link to="/How It Works" onClick={() => setIsOpen(false)} className="text-lg border-b pb-2">How It Works</Link>
             <Link to="/Listings" onClick={() => setIsOpen(false)} className="text-lg border-b pb-2">Listings</Link>
 
