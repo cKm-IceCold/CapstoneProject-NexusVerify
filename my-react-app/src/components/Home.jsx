@@ -13,7 +13,7 @@ function Home() {
     <>
       {/* 2. Main content starts here */}
       <main
-        className="min-h-screen w-full bg-cover bg-no-repeat bg-center flex flex-col items-center justify-center p-4 pt-24 md:pt-10" // Added pt-24 to prevent Navbar overlap
+        className="min-h-screen w-full bg-cover bg-no-repeat bg-center flex flex-col items-center justify-start md:justify-center p-4 pt-32 md:pt-10"
         style={{ backgroundImage: `url(${background})` }}
       >
 
@@ -50,7 +50,7 @@ function Home() {
 
           {/* ACTION BUTTONS */}
           <div className="
-                          bg-[#FE8A8A]/90 backdrop-blur-smrounded-2xl  
+                          bg-[#FE8A8A]/90 backdrop-blur-sm rounded-2xl  
                           flex flex-wrap 
                           justify-center 
                           items-center 
