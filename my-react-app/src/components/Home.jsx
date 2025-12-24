@@ -15,11 +15,11 @@ function Home() {
 
       {/* 2. Main content starts here */}
       <main
-        className="min-h-screen w-full bg-cover bg-no-repeat bg-center flex flex-col items-center justify-center p-4 pt-24" // Added pt-24 to prevent Navbar overlap
+        className="min-h-screen w-full bg-cover bg-no-repeat bg-center flex flex-col items-center justify-center p-4 pt-24 md:pt-10" // Added pt-24 to prevent Navbar overlap
         style={{ backgroundImage: `url(${background})` }}
       >
         
-        <div className="w-full max-w-4xl flex flex-col items-center mt-0:sm">
+        <div className="w-full max-w-4xl flex flex-col items-center sm:mt-0">
           
           {/* Animated User Icon */}
           <img 
