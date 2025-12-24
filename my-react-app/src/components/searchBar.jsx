@@ -64,6 +64,16 @@ function SearchBar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // --- EFFECT: Auto-clear status messages ---
+  useEffect(() => {
+    if (status.message) {
+      const timer = setTimeout(() => {
+        setStatus({ type: '', message: '' });
+      }, 5000); // 5 seconds expiry
+      return () => clearTimeout(timer);
+    }
+  }, [status.message]);
+
   // --- FETCH SEARCH DATA ---
   const handleSearch = async () => {
     setStatus({ type: '', message: '' });
@@ -194,8 +204,8 @@ function SearchBar() {
       {/* --- CUSTOM STATUS UI --- */}
       {status.message && (
         <div className={`mt-4 p-4 rounded-xl border-l-4 shadow-lg animate-in fade-in slide-in-from-top-2 duration-300 ${status.type === 'success'
-            ? 'bg-green-50 border-green-500 text-green-700'
-            : 'bg-red-50 border-red-500 text-red-700'
+          ? 'bg-green-50 border-green-500 text-green-700'
+          : 'bg-red-50 border-red-500 text-red-700'
           }`}>
           <div className="flex items-center gap-3">
             {status.type === 'success' ? (
