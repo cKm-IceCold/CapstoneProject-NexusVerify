@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Logo from '../assets/nexus-verify.png';
-import verify from '../assets/group.png';
+import verify from '../assets/Group.png';
 import loginIcon from '../assets/login.png';
 import auditors from '../assets/auditors.png';
 
