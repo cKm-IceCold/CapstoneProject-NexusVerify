@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
 import Logo from '../assets/nexus-verify.png';
 
 function Login() {
@@ -9,6 +10,19 @@ function Login() {
     const [error, setError] = useState('');
     const { login } = useAuth();
     const navigate = useNavigate();
+
+    const handleGoogleSuccess = async (credentialResponse) => {
+        console.log("Google Login Success:", credentialResponse);
+        // Here you would typically send credentialResponse.credential to your backend
+        // For now, we'll just simulate a successful login or redirect
+        alert("Google Sign-In successful! (Mock integration)");
+        navigate('/');
+    };
+
+    const handleGoogleError = () => {
+        console.log("Google Login Failed");
+        setError("Google Sign-In failed. Please try again.");
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -67,7 +81,33 @@ function Login() {
                             Sign in
                         </button>
                     </div>
+
+                    <div className="relative">
+                        <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div className="relative flex justify-center text-sm">
+                            <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                        </div>
+                    </div>
+
+                    <div className="flex justify-center">
+                        <GoogleLogin
+                            onSuccess={handleGoogleSuccess}
+                            onError={handleGoogleError}
+                            useOneTap
+                        />
+                    </div>
                 </form>
+
+                <div className="text-center mt-4">
+                    <p className="text-sm text-gray-600">
+                        Don't have an account?{' '}
+                        <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">
+                            Sign up
+                        </Link>
+                    </p>
+                </div>
             </div>
         </div>
     );

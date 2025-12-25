@@ -65,9 +65,12 @@ function Navbar() {
                 <button onClick={logout} className="text-sm font-bold text-[#FF8787] hover:underline transition-all">Logout</button>
               </div>
             ) : (
-              <Link to="/login" className="hover:scale-110 transition-transform" title="Login">
-                <img src={loginIcon} alt="Login" className="w-12 h-8 object-contain" />
-              </Link>
+              <div className="flex items-center space-x-4">
+                <Link to="/login" className="hover:scale-110 transition-transform" title="Login">
+                  <img src={loginIcon} alt="Login" className="w-12 h-8 object-contain" />
+                </Link>
+                <Link to="/register" className="text-sm font-semibold text-blue-600 hover:text-blue-700">Sign Up</Link>
+              </div>
             )}
 
             {user?.role === 'AUDITOR' && (
@@ -96,7 +99,10 @@ function Navbar() {
               {user ? (
                 <button onClick={() => { logout(); setIsOpen(false); }} className="text-[#FF8787] font-bold">Logout</button>
               ) : (
-                <Link to="/login" onClick={() => setIsOpen(false)}><img src={loginIcon} className="w-10 h-10 object-contain" /></Link>
+                <div className="flex items-center gap-4">
+                  <Link to="/login" onClick={() => setIsOpen(false)}><img src={loginIcon} className="w-10 h-10 object-contain" /></Link>
+                  <Link to="/register" onClick={() => setIsOpen(false)} className="text-blue-600 font-semibold">Sign Up</Link>
+                </div>
               )}
               {user?.role === 'AUDITOR' && (
                 <Link to="/auditors" onClick={() => setIsOpen(false)}><img src={auditors} className="w-10 h-10 object-contain" /></Link>

@@ -8,6 +8,7 @@ import Login from './components/login';
 import AuditorDashboard from './components/auditor';
 import VerifyPage from './components/verify';
 import Navbar from './components/navBar';
+import Register from './components/register';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/How It Works" element={<HowItWorks />} />
           <Route path="/Listings" element={<ListingsPage />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route path="/auditors" element={<AuditorDashboard />} />
           <Route path="/verify" element={<VerifyPage />} />
         </Routes>
