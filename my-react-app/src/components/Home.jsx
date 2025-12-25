@@ -23,13 +23,13 @@ function Home() {
           <img
             src={usersno}
             alt="Users"
-            className="w-16 mb-4 md:w-20 lg:mt-9 sm:mt-6 animate-bounce"
+            className="w-16 mb-4 md:w-20 lg:mt-12 lg:ml-9 sm:mt-6 animate-bounce"
           />
 
           {/* Heading Section */}
           <div className="text-center w-full px-2 lg:ml-7">
             <h1 className="text-2xl sm:text-3xl md:text-5xl 
-            lg:text-6xl
+            lg:text-4xl
             font-bold
              font-montserrat 
              lg:ml-30
@@ -41,7 +41,7 @@ function Home() {
               Buy Property With
               <span className="text-[#FF8787]"> Total Confidence.</span>
             </h1>
-            <p className="text-[11px] sm:text-sm font-medium leading-relaxed opacity-90">
+            <p className="text-[11px] sm:text-sm lg:ml-25 font-medium leading-relaxed opacity-90">
               Every property listed is fully authenticated, transparently priced, and government-zoning verified.
             </p>
           </div>
