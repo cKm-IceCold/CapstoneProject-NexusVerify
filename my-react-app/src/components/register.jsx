@@ -34,7 +34,7 @@ function Register() {
             if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
                 setError("Sign-in cancelled. Please try again.");
             } else {
-                setError("Google Sign-In failed: " + err.message);
+                setError("Google Sign-In failed");
             }
         }
     };
