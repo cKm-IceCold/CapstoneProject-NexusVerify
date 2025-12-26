@@ -62,7 +62,7 @@ function SearchBar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  //  EFFECT: Auto-clear status messages
+  // --- EFFECT: Auto-clear status messages
   useEffect(() => {
     if (status.message) {
       const timer = setTimeout(() => {
@@ -76,17 +76,23 @@ function SearchBar() {
   const handleSearch = async () => {
     setStatus({ type: '', message: '' });
 
-    if (!location || !property) {
-      setStatus({ type: 'error', message: "Please select both a location and property type." });
+    // Validate Input
+    if (!property) {
+      setStatus({ type: 'error', message: "Please select a property type." });
+      return;
+    }
+
+    // Strict Location Check: Must match a slug in the list
+    const selectedLocObj = dynamicLocations.find(l => l.name.toLowerCase() === location.toLowerCase());
+
+    if (!selectedLocObj) {
+      setStatus({ type: 'error', message: "Please select a valid location from the dropdown." });
       return;
     }
 
     setIsLoading(true);
 
-    // 1. Find the slug for the selected location name
-    const selectedLocObj = dynamicLocations.find(l => l.name === location);
-    // Ensure slug is used; fallback to hyphenated lower case if not found
-    const locationSlug = selectedLocObj ? selectedLocObj.slug : location.toLowerCase().replace(/\s+/g, '-');
+    const locationSlug = selectedLocObj.slug;
 
     // 2. Build Query Parameters using URLSearchParams
     const params = new URLSearchParams();
@@ -101,7 +107,14 @@ function SearchBar() {
       let beds = "1";
       if (property.includes("2 Bedroom")) beds = "2";
       if (property.includes("3 Bedroom")) beds = "3";
+      // Duplex (assumed 4 beds based on previous map, but ensuring 1-5 valid range)
       if (property.includes("Duplex")) beds = "4";
+
+      // Strict Validation for beds (just in case)
+      if (!['1', '2', '3', '4', '5'].includes(beds)) {
+        // Fallback or error? defaulting to 1 is safe
+        beds = "1";
+      }
 
       params.append('type', 'rent');
       params.append('beds', beds);
