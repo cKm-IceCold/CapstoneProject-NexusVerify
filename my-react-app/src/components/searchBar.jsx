@@ -33,7 +33,6 @@ function SearchBar() {
           method: 'GET',
           headers: {
             'API-KEY': SECRET_KEY,
-            'Content-Type': 'application/json',
             'Accept': 'application/json'
           }
         });
@@ -101,9 +100,9 @@ function SearchBar() {
 
     let endpointPath = "";
     if (property === "Land") {
-      endpointPath = "/v1/land-prices";
+      endpointPath = "/land-prices";
     } else {
-      endpointPath = "/v1/residential-prices";
+      endpointPath = "/residential-prices";
       let beds = "1";
       if (property.includes("2 Bedroom")) beds = "2";
       if (property.includes("3 Bedroom")) beds = "3";
@@ -127,7 +126,6 @@ function SearchBar() {
       const response = await fetch(API_URL, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
           'Accept': 'application/json',
           'API-KEY': SECRET_KEY
         }
