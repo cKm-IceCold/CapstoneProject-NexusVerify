@@ -25,12 +25,17 @@ function Register() {
 
     const handleGoogleSignIn = async () => {
         try {
+            setError('');
             await googleSignIn();
             // Optional: You might want to sync Google users to your backend here too
             navigate('/');
         } catch (err) {
             console.error(err);
-            setError("Google Sign-In failed.");
+            if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
+                setError("Sign-in cancelled. Please try again.");
+            } else {
+                setError("Google Sign-In failed: " + err.message);
+            }
         }
     };
 
