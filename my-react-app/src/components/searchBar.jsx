@@ -28,8 +28,6 @@ function SearchBar() {
     const fetchSupportedLocations = async () => {
       const sector = property === "Land" ? "land" : "residential";
 
-      // Use proxy path /api_estate instead of https://api.estateintel.com
-      // Move 'sector' to query params
       try {
         const response = await fetch(`/api_estate/locations?sector=${sector}`, {
           method: 'GET',
@@ -87,20 +85,30 @@ function SearchBar() {
 
     // 1. Find the slug for the selected location name
     const selectedLocObj = dynamicLocations.find(l => l.name === location);
+    // Ensure slug is used; fallback to hyphenated lower case if not found
     const locationSlug = selectedLocObj ? selectedLocObj.slug : location.toLowerCase().replace(/\s+/g, '-');
 
-    // 2. Determine Endpoint (using proxy)
-    let API_URL = "";
+    // 2. Build Query Parameters using URLSearchParams
+    const params = new URLSearchParams();
+    params.append('location', locationSlug);
+    params.append('country_code', 'NG');
+
+    let endpointPath = "";
     if (property === "Land") {
-      API_URL = `/api_estate/v1/land-prices?location=${locationSlug}&country_code=NG`;
+      endpointPath = "/v1/land-prices";
     } else {
+      endpointPath = "/v1/residential-prices";
       let beds = "1";
       if (property.includes("2 Bedroom")) beds = "2";
       if (property.includes("3 Bedroom")) beds = "3";
       if (property.includes("Duplex")) beds = "4";
 
-      API_URL = `/api_estate/v1/residential-prices?location=${locationSlug}&country_code=NG&type=rent&beds=${beds}`;
+      params.append('type', 'rent');
+      params.append('beds', beds);
     }
+
+    // Construct full URL using proxy
+    const API_URL = `/api_estate${endpointPath}?${params.toString()}`;
 
     try {
       const response = await fetch(API_URL, {

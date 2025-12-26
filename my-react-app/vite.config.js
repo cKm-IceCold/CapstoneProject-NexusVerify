@@ -14,7 +14,7 @@ export default defineConfig({
         target: 'https://api.estateintel.com',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api_estate/, ''),
-        secure: false, // In case of SSL issues
+        secure: false,
       },
     },
   },
