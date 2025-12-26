@@ -64,7 +64,7 @@ function SearchBar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // --- EFFECT: Auto-clear status messages ---
+  //  EFFECT: Auto-clear status messages
   useEffect(() => {
     if (status.message) {
       const timer = setTimeout(() => {
