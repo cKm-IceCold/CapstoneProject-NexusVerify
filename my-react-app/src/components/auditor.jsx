@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 
 function AuditorDashboard() {
-    const { user } = useAuth();
+    const { currentUser, userRole } = useAuth();
     const [properties, setProperties] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedProperty, setSelectedProperty] = useState(null);
@@ -69,7 +69,7 @@ function AuditorDashboard() {
         }
     };
 
-    if (user?.role !== 'AUDITOR') {
+    if (userRole !== 'AUDITOR') {
         return (
             <div className="min-h-screen pt-32 px-6 text-center">
                 <h1 className="text-2xl font-bold text-red-600">Access Denied</h1>

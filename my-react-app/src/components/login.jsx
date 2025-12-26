@@ -14,7 +14,7 @@ function Login() {
         try {
             setError(''); // Clear previous errors
             await googleSignIn();
-            navigate('/');
+            navigate('/profile');
         } catch (err) {
             console.error(err);
             if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
@@ -49,7 +49,7 @@ function Login() {
                 console.warn("Backend token exchange failed:", err);
             }
 
-            navigate('/');
+            navigate('/profile');
         } catch (err) {
             setError("Failed to log in: " + err.message);
         }

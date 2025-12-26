@@ -13,7 +13,7 @@ function Register() {
     });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const { signup, googleSignIn } = useAuth();
+    const { signup, googleSignIn, fetchUserRole } = useAuth();
     const navigate = useNavigate();
 
     const handleChange = (e) => {
@@ -28,7 +28,7 @@ function Register() {
             setError('');
             await googleSignIn();
             // Optional: You might want to sync Google users to your backend here too
-            navigate('/');
+            navigate('/profile');
         } catch (err) {
             console.error(err);
             if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
@@ -73,6 +73,7 @@ function Register() {
                     // If the backend returns a token, we should store it
                     if (data.token) {
                         localStorage.setItem('backend_token', data.token);
+                        await fetchUserRole(); // Sync role immediately
                     }
                 } else {
                     console.warn("Backend user creation failed, but Firebase auth succeeded.");
@@ -81,7 +82,7 @@ function Register() {
                 console.warn("Backend unavailable:", backendErr);
             }
 
-            navigate('/login', { state: { message: 'Registration successful!' } });
+            navigate('/profile');
         } catch (err) {
             setError('Failed to create an account: ' + err.message);
         } finally {

@@ -8,7 +8,7 @@ import auditors from '../assets/auditors.png';
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const { user, logout } = useAuth();
+  const { currentUser, userRole, logout } = useAuth();
 
   const handleHomeClick = (e) => {
     if (window.location.pathname === '/') {
@@ -59,9 +59,11 @@ function Navbar() {
               <img src={verify} alt="Verify" className="w-12 h-8 object-contain" />
             </Link>
 
-            {user ? (
+            {currentUser ? (
               <div className="flex items-center gap-4">
-                <span className="text-sm text-gray-600">Hi, {user.username}</span>
+                <Link to="/profile" className="text-sm font-bold text-gray-700 hover:text-blue-600 transition-colors">
+                  Profile
+                </Link>
                 <button onClick={logout} className="text-sm font-bold text-[#FF8787] hover:underline transition-all">Logout</button>
               </div>
             ) : (
@@ -73,7 +75,7 @@ function Navbar() {
               </div>
             )}
 
-            {user?.role === 'AUDITOR' && (
+            {userRole === 'AUDITOR' && (
               <Link to="/auditors" className="hover:scale-110 transition-transform" title="Auditor Panel">
                 <img src={auditors} alt="Auditors" className="w-12 h-8 object-contain" />
               </Link>
@@ -90,13 +92,13 @@ function Navbar() {
             <Link to="/How It Works" onClick={() => setIsOpen(false)} className="text-lg border-b pb-2">How It Works</Link>
             <Link to="/Listings" onClick={() => setIsOpen(false)} className="text-lg border-b pb-2">Listings</Link>
 
-            {user && (
-              <div className="text-lg border-b pb-2 text-gray-600">Logged in as: {user.username}</div>
+            {currentUser && (
+              <div className="text-lg border-b pb-2 text-gray-600 truncate">Logged in as: {currentUser.email}</div>
             )}
 
             <div className="flex justify-around pt-4">
               <Link to="/verify" onClick={() => setIsOpen(false)}><img src={verify} className="w-10 h-10 object-contain" /></Link>
-              {user ? (
+              {currentUser ? (
                 <button onClick={() => { logout(); setIsOpen(false); }} className="text-[#FF8787] font-bold">Logout</button>
               ) : (
                 <div className="flex items-center gap-4">
@@ -104,7 +106,7 @@ function Navbar() {
                   <Link to="/register" onClick={() => setIsOpen(false)} className="text-blue-600 font-semibold">Sign Up</Link>
                 </div>
               )}
-              {user?.role === 'AUDITOR' && (
+              {userRole === 'AUDITOR' && (
                 <Link to="/auditors" onClick={() => setIsOpen(false)}><img src={auditors} className="w-10 h-10 object-contain" /></Link>
               )}
             </div>

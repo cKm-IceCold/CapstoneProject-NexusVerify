@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 
 function VerifyPage() {
-    const { user } = useAuth();
+    const { currentUser } = useAuth();
     const [formData, setFormData] = useState({
         title: '',
         location: '',
@@ -27,7 +27,7 @@ function VerifyPage() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!user) {
+        if (!currentUser) {
             setStatus({ type: 'error', message: 'You must be logged in to register a property.' });
             return;
         }
