@@ -28,16 +28,16 @@ function SearchBar() {
     const fetchSupportedLocations = async () => {
       const sector = property === "Land" ? "land" : "residential";
 
+      // Use proxy path /api_estate instead of https://api.estateintel.com
+      // Move 'sector' to query params
       try {
-        const response = await fetch('https://api.estateintel.com/locations', {
+        const response = await fetch(`/api_estate/locations?sector=${sector}`, {
           method: 'GET',
           headers: {
             'API-KEY': SECRET_KEY,
             'Content-Type': 'application/json',
             'Accept': 'application/json'
-          },
-          // Some APIs require GET with body; if this fails, try removing body or moving to query params
-          body: JSON.stringify({ sector: sector })
+          }
         });
 
         const result = await response.json();
@@ -89,17 +89,17 @@ function SearchBar() {
     const selectedLocObj = dynamicLocations.find(l => l.name === location);
     const locationSlug = selectedLocObj ? selectedLocObj.slug : location.toLowerCase().replace(/\s+/g, '-');
 
-    // 2. Determine Endpoint
+    // 2. Determine Endpoint (using proxy)
     let API_URL = "";
     if (property === "Land") {
-      API_URL = `https://api.estateintel.com/v1/land-prices?location=${locationSlug}&country_code=NG`;
+      API_URL = `/api_estate/v1/land-prices?location=${locationSlug}&country_code=NG`;
     } else {
       let beds = "1";
       if (property.includes("2 Bedroom")) beds = "2";
       if (property.includes("3 Bedroom")) beds = "3";
       if (property.includes("Duplex")) beds = "4";
 
-      API_URL = `https://api.estateintel.com/v1/residential-prices?location=${locationSlug}&country_code=NG&type=rent&beds=${beds}`;
+      API_URL = `/api_estate/v1/residential-prices?location=${locationSlug}&country_code=NG&type=rent&beds=${beds}`;
     }
 
     try {
