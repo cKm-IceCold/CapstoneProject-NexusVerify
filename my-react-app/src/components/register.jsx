@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { GoogleLogin } from '@react-oauth/google';
+import { useAuth } from '../context/AuthContext';
 import Logo from '../assets/nexus-verify.png';
 
 function Register() {
@@ -13,25 +13,25 @@ function Register() {
     });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const { signup, googleSignIn } = useAuth();
     const navigate = useNavigate();
-
-    const handleGoogleSuccess = async (credentialResponse) => {
-        console.log("Google Sign-Up Success:", credentialResponse);
-        // Here you would typically send credentialResponse.credential to your backend
-        alert("Google Sign-Up successful! (Mock integration)");
-        navigate('/');
-    };
-
-    const handleGoogleError = () => {
-        console.log("Google Sign-Up Failed");
-        setError("Google Sign-Up failed. Please try again.");
-    };
 
     const handleChange = (e) => {
         setFormData({
             ...formData,
             [e.target.name]: e.target.value
         });
+    };
+
+    const handleGoogleSignIn = async () => {
+        try {
+            await googleSignIn();
+            // Optional: You might want to sync Google users to your backend here too
+            navigate('/');
+        } catch (err) {
+            console.error(err);
+            setError("Google Sign-In failed.");
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -45,28 +45,34 @@ function Register() {
 
         setLoading(true);
         try {
-            const response = await fetch('http://localhost:8000/api/users/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    username: formData.username,
-                    email: formData.email,
-                    password: formData.password,
-                    role: formData.role
-                }),
-            });
+            // 1. Create User in Firebase
+            await signup(formData.email, formData.password);
 
-            const data = await response.json();
+            // 2. Create User in Backend (to keep relational data sync)
+            try {
+                const response = await fetch('http://localhost:8000/api/users/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: formData.username,
+                        email: formData.email,
+                        password: formData.password,
+                        role: formData.role
+                    }),
+                });
 
-            if (response.ok) {
-                navigate('/login', { state: { message: 'Registration successful! Please log in.' } });
-            } else {
-                setError(data.username?.[0] || data.email?.[0] || 'Registration failed');
+                if (!response.ok) {
+                    console.warn("Backend user creation failed, but Firebase auth succeeded.");
+                }
+            } catch (backendErr) {
+                console.warn("Backend unavailable:", backendErr);
             }
+
+            navigate('/login', { state: { message: 'Registration successful!' } });
         } catch (err) {
-            setError('Connection failed. Please check if the backend is running.');
+            setError('Failed to create an account: ' + err.message);
         } finally {
             setLoading(false);
         }
@@ -160,11 +166,16 @@ function Register() {
                     </div>
 
                     <div className="flex justify-center">
-                        <GoogleLogin
-                            onSuccess={handleGoogleSuccess}
-                            onError={handleGoogleError}
-                            useOneTap
-                        />
+                        <button
+                            type="button"
+                            onClick={handleGoogleSignIn}
+                            className="w-full flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        >
+                            <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z" />
+                            </svg>
+                            Google
+                        </button>
                     </div>
                 </form>
 

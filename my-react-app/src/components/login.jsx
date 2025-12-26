@@ -1,37 +1,33 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-import { GoogleLogin } from '@react-oauth/google';
 import Logo from '../assets/nexus-verify.png';
 
 function Login() {
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const { login } = useAuth();
+    const { login, googleSignIn } = useAuth();
     const navigate = useNavigate();
 
-    const handleGoogleSuccess = async (credentialResponse) => {
-        console.log("Google Login Success:", credentialResponse);
-        // Here you would typically send credentialResponse.credential to your backend
-        // For now, we'll just simulate a successful login or redirect
-        alert("Google Sign-In successful! (Mock integration)");
-        navigate('/');
-    };
-
-    const handleGoogleError = () => {
-        console.log("Google Login Failed");
-        setError("Google Sign-In failed. Please try again.");
+    const handleGoogleSignIn = async () => {
+        try {
+            await googleSignIn();
+            navigate('/');
+        } catch (err) {
+            console.error(err);
+            setError("Google Sign-In failed.");
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
-        const result = await login(username, password);
-        if (result.success) {
+        try {
+            await login(email, password);
             navigate('/');
-        } else {
-            setError(result.message);
+        } catch (err) {
+            setError("Failed to log in: " + err.message);
         }
     };
 
@@ -53,12 +49,12 @@ function Login() {
                     <div className="rounded-md shadow-sm -space-y-px">
                         <div>
                             <input
-                                type="text"
+                                type="email"
                                 required
                                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                                placeholder="Username"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
+                                placeholder="Email Address"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                             />
                         </div>
                         <div>
@@ -92,11 +88,16 @@ function Login() {
                     </div>
 
                     <div className="flex justify-center">
-                        <GoogleLogin
-                            onSuccess={handleGoogleSuccess}
-                            onError={handleGoogleError}
-                            useOneTap
-                        />
+                        <button
+                            type="button"
+                            onClick={handleGoogleSignIn}
+                            className="w-full flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        >
+                            <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z" />
+                            </svg>
+                            Google
+                        </button>
                     </div>
                 </form>
 
