@@ -7,22 +7,35 @@ import ListingsPage from './listings';
 const INITIAL_DATA = [
     {
         id: 1,
-        title: "Luxury 3 Bedroom Apartment",
-        price: "100,000",
+        title: "Luxury 4 Bedroom Duplex",
+        price: "180,000,000",
+        currency: "₦",
         location: "Lekki Phase 1, Lagos",
-        image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
-        agent: "ADELE SHEIN",
-        agentImg: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=150",
+        image: "https://images.unsplash.com/photo-1628174392663-ada93010776b?auto=format&fit=crop&w=800&q=80", // Modern duplex look
+        agent: "NGOZI ADEBAYO",
+        agentImg: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=150&q=150", // African woman portrait
         verified: true
     },
     {
         id: 2,
-        title: "Modern Duplex",
-        price: "250,000",
+        title: "Modern 2 Bedroom Apartment",
+        price: "75,000,000",
+        currency: "₦",
         location: "Victoria Island, Lagos",
-        image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
-        agent: "ADELE SHEIN",
-        agentImg: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=150",
+        image: "https://images.unsplash.com/photo-1522050212171-61b01dd24579?auto=format&fit=crop&w=800&q=80", // High rise apartment look
+        agent: "EMMANUEL OKAFOR",
+        agentImg: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=150", // African man portrait
+        verified: true
+    },
+    {
+        id: 3,
+        title: "5 Bedroom Detached House",
+        price: "450,000,000",
+        currency: "₦",
+        location: "Ikoyi, Lagos",
+        image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80", // Luxurious mansion look
+        agent: "NGOZI ADEBAYO",
+        agentImg: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=150&q=150",
         verified: true
     }
 ];
