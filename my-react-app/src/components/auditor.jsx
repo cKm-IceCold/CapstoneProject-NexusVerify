@@ -16,8 +16,8 @@ function AuditorDashboard() {
 
     const fetchPendingProperties = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:8000/api/properties/', {
+            const token = localStorage.getItem('backend_token');
+            const response = await fetch('https://backendcapstone-mhh2.onrender.com/api/properties/', {
                 headers: {
                     'Authorization': `Token ${token}`
                 }
@@ -42,8 +42,8 @@ function AuditorDashboard() {
         setMessage({ type: '', content: '' });
 
         try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:8000/api/properties/${selectedProperty.id}/verify/`, {
+            const token = localStorage.getItem('backend_token');
+            const response = await fetch(`https://backendcapstone-mhh2.onrender.com/api/properties/${selectedProperty.id}/verify/`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Token ${token}`,

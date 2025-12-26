@@ -9,7 +9,7 @@ function Register() {
         email: '',
         password: '',
         confirmPassword: '',
-        role: 'INDIVIDUAL_USER'
+        role: 'CUSTOMER'
     });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
@@ -55,7 +55,7 @@ function Register() {
 
             // 2. Create User in Backend (to keep relational data sync)
             try {
-                const response = await fetch('http://localhost:8000/api/users/', {
+                const response = await fetch('https://backendcapstone-mhh2.onrender.com/api/users/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -68,7 +68,13 @@ function Register() {
                     }),
                 });
 
-                if (!response.ok) {
+                if (response.ok) {
+                    const data = await response.json();
+                    // If the backend returns a token, we should store it
+                    if (data.token) {
+                        localStorage.setItem('backend_token', data.token);
+                    }
+                } else {
                     console.warn("Backend user creation failed, but Firebase auth succeeded.");
                 }
             } catch (backendErr) {
@@ -145,7 +151,7 @@ function Register() {
                             value={formData.role}
                             onChange={handleChange}
                         >
-                            <option value="INDIVIDUAL_USER">Buyer / Individual</option>
+                            <option value="CUSTOMER">Buyer / Individual</option>
                             <option value="REAL_ESTATE_COMPANY">Real Estate Company / Seller</option>
                             <option value="AUDITOR">Auditor (Internal Use)</option>
                         </select>

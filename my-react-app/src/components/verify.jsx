@@ -41,8 +41,8 @@ function VerifyPage() {
         if (image) data.append('image', image);
 
         try {
-            const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:8000/api/properties/', {
+            const token = localStorage.getItem('backend_token');
+            const response = await fetch('https://backendcapstone-mhh2.onrender.com/api/properties/', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Token ${token}`

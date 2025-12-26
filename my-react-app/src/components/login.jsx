@@ -7,7 +7,7 @@ function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const { login, googleSignIn } = useAuth();
+    const { login, googleSignIn, fetchUserRole } = useAuth();
     const navigate = useNavigate();
 
     const handleGoogleSignIn = async () => {
@@ -30,6 +30,25 @@ function Login() {
         setError('');
         try {
             await login(email, password);
+
+            // Sync with backend to get Token
+            try {
+                const response = await fetch('https://backendcapstone-mhh2.onrender.com/api/token/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: email, password: password })
+                    // Note: Django uses 'username' for the token endpoint by default. 
+                    // If you use Email as Username, this works.
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('backend_token', data.token);
+                    await fetchUserRole(); // Refresh roles in context
+                }
+            } catch (err) {
+                console.warn("Backend token exchange failed:", err);
+            }
+
             navigate('/');
         } catch (err) {
             setError("Failed to log in: " + err.message);

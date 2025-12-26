@@ -17,6 +17,7 @@ export function useAuth() {
 
 export function AuthProvider({ children }) {
     const [currentUser, setCurrentUser] = useState(null);
+    const [userRole, setUserRole] = useState(null);
     const [loading, setLoading] = useState(true);
 
     function signup(email, password) {
@@ -28,7 +29,10 @@ export function AuthProvider({ children }) {
     }
 
     function logout() {
-        return signOut(auth);
+        return signOut(auth).then(() => {
+            setUserRole(null);
+            localStorage.removeItem('backend_token');
+        });
     }
 
     function googleSignIn() {
@@ -36,9 +40,30 @@ export function AuthProvider({ children }) {
         return signInWithRedirect(auth, provider);
     }
 
+    const fetchUserRole = async () => {
+        const token = localStorage.getItem('backend_token');
+        if (!token) return;
+        try {
+            const response = await fetch('https://backendcapstone-mhh2.onrender.com/api/users/me/', {
+                headers: {
+                    'Authorization': `Token ${token}`
+                }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setUserRole(data.role);
+            }
+        } catch (err) {
+            console.error("Failed to fetch role:", err);
+        }
+    };
+
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
             setCurrentUser(user);
+            if (user) {
+                await fetchUserRole();
+            }
             setLoading(false);
         });
 
@@ -47,10 +72,12 @@ export function AuthProvider({ children }) {
 
     const value = {
         currentUser,
+        userRole,
         login,
         signup,
         logout,
-        googleSignIn
+        googleSignIn,
+        fetchUserRole
     };
 
     return (
