@@ -66,7 +66,7 @@ function SearchBar({ onSearchResult }) {
     if (status.message) {
       const timer = setTimeout(() => {
         setStatus({ type: '', message: '' });
-      }, 5000); // 5 seconds expiry
+      }, 30000); // 30 seconds expiry
       return () => clearTimeout(timer);
     }
   }, [status.message]);

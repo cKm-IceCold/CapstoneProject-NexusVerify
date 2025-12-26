@@ -1,50 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import SearchBar from './searchBar';
 
-// Default Dummy Data (Initial State)
-const INITIAL_DATA = [
-  {
-    id: 1,
-    title: "Luxury 3 Bedroom Apartment",
-    price: "100,000",
-    location: "Lekki Phase 1, Lagos",
-    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
-    agent: "ADELE SHEIN",
-    agentImg: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=150",
-    verified: true
-  },
-  {
-    id: 2,
-    title: "Modern Duplex",
-    price: "250,000",
-    location: "Victoria Island, Lagos",
-    image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
-    agent: "ADELE SHEIN",
-    agentImg: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=150",
-    verified: true
-  }
-];
-
-// Image Mapper Helper
-const getImageForProperty = (type) => {
-  if (!type) return "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80";
-  const lowerType = type.toLowerCase();
-
-  if (lowerType.includes("land")) {
-    return "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80";
-  } else if (lowerType.includes("apartment") || lowerType.includes("flat")) {
-    return "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80";
-  } else if (lowerType.includes("duplex") || lowerType.includes("house")) {
-    return "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80";
-  }
-  return "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80";
-};
-
+// Listing Card Component (Presentation only)
 function ListingCard({ item }) {
-  // Ensure price is formatted if it's a number
   const formattedPrice = typeof item.price === 'number' ? item.price.toLocaleString() : item.price;
-  // Get currency symbol (default to checking if it's in the string or add it)
-  // The API returns "NGN" or "₦", or we can hardcode if implied
   const currency = item.currency || "";
 
   return (
@@ -52,7 +11,6 @@ function ListingCard({ item }) {
       {/* Property Image */}
       <div className="w-full h-48 relative">
         <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
-        {/* The Teal "Wave" or Banner from your design */}
         <div className="absolute bottom-0 w-full h-12 bg-[#4FD1C5] opacity-90 flex items-center justify-center">
           <div className="w-8 h-8 border-2 border-white rounded-full flex items-center justify-center">
             <span className="text-white text-[8px]">NEXUS</span>
@@ -64,9 +22,7 @@ function ListingCard({ item }) {
       <div className="p-6 w-full">
         <h3 className="font-bold text-lg text-gray-900 uppercase">{item.title}</h3>
         <p className="text-gray-600 font-bold mt-1 uppercase text-sm">PRICE: {currency} {formattedPrice}</p>
-
         <p className="text-[#3182CE] font-bold text-xl mt-2">{currency} {formattedPrice}</p>
-
         <p className="text-gray-400 text-xs mt-4 leading-relaxed px-4">
           Verified property listing with accurate market data and document checks.
         </p>
@@ -93,28 +49,9 @@ function ListingCard({ item }) {
   );
 }
 
-function ListingsPage() {
-  const [searchResults, setSearchResults] = useState(INITIAL_DATA);
-
-  // Callback to handle data from SearchBar API call
-  const handleSearchResult = (result) => {
-    // result contains: price, currency, propertyType, locationName...
-
-    const newListing = {
-      id: Date.now(),
-      title: `${result.propertyType} in ${result.locationName}`,
-      price: result.price, // Will be formatted in Card
-      currency: "₦", // API returns currency code usually, assuming NGN/₦ for Estate Intel
-      location: result.locationName,
-      image: getImageForProperty(result.propertyType),
-      agent: "Nexus AI",
-      agentImg: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=150",
-      verified: true
-    };
-
-    // Replace current listings with the new search result
-    setSearchResults([newListing]);
-  };
+// Listings Page now accepts props for results
+function ListingsPage({ results = [], onSearchResult }) {
+  // If no results passed (e.g. initial load), results will be the dummy data from parent
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#B2F5EA] to-[#F7FAFC] pt-24">
@@ -125,16 +62,20 @@ function ListingsPage() {
           <p className="text-gray-700 font-semibold mt-2">Search through our verified Listings and competitive prices</p>
         </div>
 
-        {/* Search Section */}
+        {/* Search Section (Optional here, but kept if user wants to search from here too) */}
         <div className="flex justify-center mb-20">
-          <SearchBar onSearchResult={handleSearchResult} />
+          <SearchBar onSearchResult={onSearchResult} />
         </div>
 
         {/* Listings Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-          {searchResults.map(item => (
-            <ListingCard key={item.id} item={item} />
-          ))}
+          {results && results.length > 0 ? (
+            results.map(item => (
+              <ListingCard key={item.id} item={item} />
+            ))
+          ) : (
+            <p className="text-center col-span-full text-gray-500">No listings found.</p>
+          )}
         </div>
       </div>
     </div>

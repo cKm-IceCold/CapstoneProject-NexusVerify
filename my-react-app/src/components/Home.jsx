@@ -7,7 +7,7 @@ import verify from '../assets/Verify.png'
 import validate from '../assets/Validate.png'
 import SearchBar from './searchBar'
 
-function Home() {
+function Home({ onSearchResult }) {
   const navigate = useNavigate();
   return (
     <>
@@ -46,7 +46,7 @@ function Home() {
             </p>
           </div>
 
-          <SearchBar />
+          <SearchBar onSearchResult={onSearchResult} />
 
           {/* ACTION BUTTONS */}
           <div className="
