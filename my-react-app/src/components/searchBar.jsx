@@ -6,7 +6,7 @@ const PROPERTY_TYPES = [
   "3 Bedroom Flat", "Duplex", "Land"
 ];
 
-function SearchBar() {
+function SearchBar({ onSearchResult }) {
   const [location, setLocation] = useState("");
   const [property, setProperty] = useState("");
   const [dynamicLocations, setDynamicLocations] = useState([]);
@@ -138,6 +138,17 @@ function SearchBar() {
           type: 'success',
           message: `${result.message}: ${result.data.currency} ${result.data.price.toLocaleString()}`
         });
+
+        // Pass result to parent
+        if (onSearchResult) {
+          onSearchResult({
+            ...result.data,
+            locationSlug: locationSlug, // Requested by user
+            locationName: location,
+            propertyType: property
+          });
+        }
+
       } else {
         setStatus({
           type: 'error',

@@ -1,9 +1,8 @@
-import React from 'react';
-import SearchBar from './searchBar'; // Using the one we built
+import React, { useState } from 'react';
+import SearchBar from './searchBar';
 
-
-// Dummy data to show how it looks with multiple cards
-const LISTINGS_DATA = [
+// Default Dummy Data (Initial State)
+const INITIAL_DATA = [
   {
     id: 1,
     title: "Luxury 3 Bedroom Apartment",
@@ -23,20 +22,31 @@ const LISTINGS_DATA = [
     agent: "ADELE SHEIN",
     agentImg: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=150",
     verified: true
-  },
-  {
-    id: 3,
-    title: "Prime Land Space",
-    price: "80,000",
-    location: "Ikeja, Lagos",
-    image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80",
-    agent: "ADELE SHEIN",
-    agentImg: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=150",
-    verified: true
   }
 ];
 
+// Image Mapper Helper
+const getImageForProperty = (type) => {
+  if (!type) return "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80";
+  const lowerType = type.toLowerCase();
+
+  if (lowerType.includes("land")) {
+    return "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80";
+  } else if (lowerType.includes("apartment") || lowerType.includes("flat")) {
+    return "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80";
+  } else if (lowerType.includes("duplex") || lowerType.includes("house")) {
+    return "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80";
+  }
+  return "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80";
+};
+
 function ListingCard({ item }) {
+  // Ensure price is formatted if it's a number
+  const formattedPrice = typeof item.price === 'number' ? item.price.toLocaleString() : item.price;
+  // Get currency symbol (default to checking if it's in the string or add it)
+  // The API returns "NGN" or "₦", or we can hardcode if implied
+  const currency = item.currency || "";
+
   return (
     <div className="bg-white rounded-[2rem] shadow-lg overflow-hidden flex flex-col items-center text-center pb-6 border border-gray-100 transition-transform hover:scale-[1.02]">
       {/* Property Image */}
@@ -53,9 +63,9 @@ function ListingCard({ item }) {
       {/* Content */}
       <div className="p-6 w-full">
         <h3 className="font-bold text-lg text-gray-900 uppercase">{item.title}</h3>
-        <p className="text-gray-600 font-bold mt-1 uppercase text-sm">PRICE: ${item.price}</p>
+        <p className="text-gray-600 font-bold mt-1 uppercase text-sm">PRICE: {currency} {formattedPrice}</p>
 
-        <p className="text-[#3182CE] font-bold text-xl mt-2">${item.price}</p>
+        <p className="text-[#3182CE] font-bold text-xl mt-2">{currency} {formattedPrice}</p>
 
         <p className="text-gray-400 text-xs mt-4 leading-relaxed px-4">
           Verified property listing with accurate market data and document checks.
@@ -84,6 +94,28 @@ function ListingCard({ item }) {
 }
 
 function ListingsPage() {
+  const [searchResults, setSearchResults] = useState(INITIAL_DATA);
+
+  // Callback to handle data from SearchBar API call
+  const handleSearchResult = (result) => {
+    // result contains: price, currency, propertyType, locationName...
+
+    const newListing = {
+      id: Date.now(),
+      title: `${result.propertyType} in ${result.locationName}`,
+      price: result.price, // Will be formatted in Card
+      currency: "₦", // API returns currency code usually, assuming NGN/₦ for Estate Intel
+      location: result.locationName,
+      image: getImageForProperty(result.propertyType),
+      agent: "Nexus AI",
+      agentImg: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=150",
+      verified: true
+    };
+
+    // Replace current listings with the new search result
+    setSearchResults([newListing]);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#B2F5EA] to-[#F7FAFC] pt-24">
       <div className="max-w-7xl mx-auto px-4 py-12">
@@ -95,12 +127,12 @@ function ListingsPage() {
 
         {/* Search Section */}
         <div className="flex justify-center mb-20">
-          <SearchBar />
+          <SearchBar onSearchResult={handleSearchResult} />
         </div>
 
         {/* Listings Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-          {LISTINGS_DATA.map(item => (
+          {searchResults.map(item => (
             <ListingCard key={item.id} item={item} />
           ))}
         </div>
