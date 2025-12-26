@@ -11,7 +11,7 @@ const INITIAL_DATA = [
         price: "180,000,000",
         currency: "₦",
         location: "Lekki Phase 1, Lagos",
-        image: "https://images.unsplash.com/photo-1628174392663-ada93010776b?auto=format&fit=crop&w=800&q=80", // Modern duplex look
+        image: "https://images.unsplash.com/photo-1600596542815-e32c8cc22ebe?auto=format&fit=crop&w=800&q=80", // Modern duplex look
         agent: "NGOZI ADEBAYO",
         agentImg: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=150&q=150", // African woman portrait
         verified: true
