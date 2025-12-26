@@ -1,6 +1,6 @@
 # Nexus Verify: Frontend Portal
 
-Nexus Verify is a secure, responsive real estate platform built with React and Tailwind CSS. It connects to a robust Django REST Framework backend to ensure property document authenticity and transparent market valuation.
+Nexus Verify is a secure, responsive real estate platform built with React and Tailwind CSS. It connects to a robust Django REST Framework backend (still working on this) to ensure property document authenticity and transparent market valuation.
 
 ## 🚀 Key Project Features
 
