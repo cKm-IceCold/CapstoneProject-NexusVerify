@@ -6,7 +6,7 @@ import {
     signOut,
     onAuthStateChanged,
     GoogleAuthProvider,
-    signInWithRedirect
+    signInWithPopup
 } from "firebase/auth";
 
 const AuthContext = React.createContext();
@@ -37,7 +37,8 @@ export function AuthProvider({ children }) {
 
     function googleSignIn() {
         const provider = new GoogleAuthProvider();
-        return signInWithRedirect(auth, provider);
+        console.log("Starting Google Sign-In...");
+        return signInWithPopup(auth, provider);
     }
 
     const fetchUserRole = async () => {

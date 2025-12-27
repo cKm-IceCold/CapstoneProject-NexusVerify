@@ -12,15 +12,33 @@ function Login() {
 
     const handleGoogleSignIn = async () => {
         try {
-            setError(''); // Clear previous errors
-            await googleSignIn();
+            setError('');
+            const result = await googleSignIn();
+            const user = result.user;
+
+            // Sync Google user with backend
+            try {
+                const response = await fetch('https://backendcapstone-mhh2.onrender.com/api/users/social_login/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: user.email })
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('backend_token', data.token);
+                    await fetchUserRole();
+                }
+            } catch (err) {
+                console.warn("Backend social sync failed:", err);
+            }
+
             navigate('/profile');
         } catch (err) {
             console.error(err);
             if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
                 setError("Sign-in cancelled. Please try again.");
             } else {
-                setError("Google Sign-In failed");
+                setError("Google Sign-In failed: " + err.message);
             }
         }
     };
@@ -31,19 +49,19 @@ function Login() {
         try {
             await login(email, password);
 
-            // Sync with backend to get Token
+            // Sync with backend to get Token (Backend now supports Email as Username)
             try {
                 const response = await fetch('https://backendcapstone-mhh2.onrender.com/api/token/', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username: email, password: password })
-                    // Note: Django uses 'username' for the token endpoint by default. 
-                    // If you use Email as Username, this works.
                 });
                 if (response.ok) {
                     const data = await response.json();
                     localStorage.setItem('backend_token', data.token);
-                    await fetchUserRole(); // Refresh roles in context
+                    await fetchUserRole();
+                } else {
+                    console.warn("Backend token exchange failed (credentials mismatch in Django).");
                 }
             } catch (err) {
                 console.warn("Backend token exchange failed:", err);
