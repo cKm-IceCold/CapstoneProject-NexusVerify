@@ -14,25 +14,31 @@ function Login() {
         try {
             setError('');
             const result = await googleSignIn();
-            const user = result.user;
 
-            // Sync Google user with backend
-            try {
-                const response = await fetch('https://backendcapstone-mhh2.onrender.com/api/users/social_login/', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: user.email })
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    localStorage.setItem('backend_token', data.token);
-                    await fetchUserRole();
+            // For desktop (popup), result will be returned immediately
+            // For mobile (redirect), result will be null and handled by AuthContext
+            if (result?.user) {
+                const user = result.user;
+
+                // Sync Google user with backend
+                try {
+                    const response = await fetch('https://backendcapstone-mhh2.onrender.com/api/users/social_login/', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: user.email })
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        localStorage.setItem('backend_token', data.token);
+                        await fetchUserRole();
+                    }
+                } catch (err) {
+                    console.warn("Backend social sync failed:", err);
                 }
-            } catch (err) {
-                console.warn("Backend social sync failed:", err);
-            }
 
-            navigate('/profile');
+                navigate('/profile');
+            }
+            // If result is null (mobile redirect), the redirect will happen automatically
         } catch (err) {
             console.error(err);
             if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {

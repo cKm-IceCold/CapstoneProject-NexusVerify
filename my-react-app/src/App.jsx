@@ -10,11 +10,13 @@ import VerifyPage from './components/verify';
 import Navbar from './components/navBar';
 import Register from './components/register';
 import Profile from './components/Profile';
+import RedirectHandler from './components/RedirectHandler';
 
 function App() {
   return (
     <AuthProvider>
       <Router>
+        <RedirectHandler />
         <Navbar />
         <Routes>
           <Route path="/" element={<LandingPage />} />
