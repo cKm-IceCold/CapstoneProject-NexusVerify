@@ -6,6 +6,35 @@ const PROPERTY_TYPES = [
   "3 Bedroom Flat", "Duplex", "Land"
 ];
 
+// Major Lagos locations (static list for instant loading)
+const LAGOS_LOCATIONS = [
+  { name: "Lekki Phase 1", slug: "lekki-phase-1" },
+  { name: "Lekki Phase 2", slug: "lekki-phase-2" },
+  { name: "Ikoyi", slug: "ikoyi" },
+  { name: "Victoria Island", slug: "victoria-island" },
+  { name: "Ajah", slug: "ajah" },
+  { name: "Ikeja", slug: "ikeja" },
+  { name: "Yaba", slug: "yaba" },
+  { name: "Surulere", slug: "surulere" },
+  { name: "Magodo", slug: "magodo" },
+  { name: "Gbagada", slug: "gbagada" },
+  { name: "Ikotun", slug: "ikotun" },
+  { name: "Ikorodu", slug: "ikorodu" },
+  { name: "Maryland", slug: "maryland" },
+  { name: "Ogudu", slug: "ogudu" },
+  { name: "Ojota", slug: "ojota" },
+  { name: "Sangotedo", slug: "sangotedo" },
+  { name: "Chevron", slug: "chevron" },
+  { name: "Agege", slug: "agege" },
+  { name: "Apapa", slug: "apapa" },
+  { name: "Festac", slug: "festac" },
+  { name: "Isolo", slug: "isolo" },
+  { name: "Oshodi", slug: "oshodi" },
+  { name: "Egbeda", slug: "egbeda" },
+  { name: "Alimosho", slug: "alimosho" },
+  { name: "Mushin", slug: "mushin" }
+];
+
 function SearchBar({ onSearchResult }) {
   const [location, setLocation] = useState("");
   const [property, setProperty] = useState("");
@@ -21,35 +50,12 @@ function SearchBar({ onSearchResult }) {
 
   const SECRET_KEY = import.meta.env.VITE_EI_SECRET_KEY;
 
-  // --- EFFECT: Fetch locations when property type changes ---
+  // Initialize locations with static list (no API call needed)
   useEffect(() => {
     if (!property) return;
-
-    const fetchSupportedLocations = async () => {
-      const sector = property === "Land" ? "land" : "residential";
-
-      try {
-        const response = await fetch(`/api_estate/locations?sector=${sector}`, {
-          method: 'GET',
-          headers: {
-            'API-KEY': SECRET_KEY,
-            'Accept': 'application/json'
-          }
-        });
-
-        const result = await response.json();
-        if (result.success) {
-          // Filter for Lagos only as requested
-          const lagosOnly = result.data.locations.filter(loc => loc.city === "Lagos");
-          setDynamicLocations(lagosOnly);
-        }
-      } catch (error) {
-        console.error("Location Fetch Error:", error);
-      }
-    };
-
-    fetchSupportedLocations();
-  }, [property, SECRET_KEY]);
+    // Use the same static list for both land and residential
+    setDynamicLocations(LAGOS_LOCATIONS);
+  }, [property]);
 
   // Close dropdowns if user clicks outside
   useEffect(() => {
