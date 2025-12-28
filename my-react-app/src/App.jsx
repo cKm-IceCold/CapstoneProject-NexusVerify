@@ -11,12 +11,15 @@ import Navbar from './components/navBar';
 import Register from './components/register';
 import Profile from './components/Profile';
 import RedirectHandler from './components/RedirectHandler';
+import AuthDebugger from './components/AuthDebugger';
 
 function App() {
   return (
     <AuthProvider>
       <Router>
         <RedirectHandler />
+        {/* Remove AuthDebugger after testing */}
+        <AuthDebugger />
         <Navbar />
         <Routes>
           <Route path="/" element={<LandingPage />} />

@@ -39,16 +39,19 @@ export function AuthProvider({ children }) {
 
     function googleSignIn() {
         const provider = new GoogleAuthProvider();
-        console.log("Starting Google Sign-In...");
 
         // Detect if user is on mobile device
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
+        console.log("🔐 Starting Google Sign-In...");
+        console.log("📱 Device type:", isMobile ? "Mobile" : "Desktop");
+        console.log("🌐 User Agent:", navigator.userAgent);
+
         if (isMobile) {
-            console.log("Mobile detected, using signInWithRedirect");
+            console.log("Using signInWithRedirect for mobile");
             return signInWithRedirect(auth, provider);
         } else {
-            console.log("Desktop detected, using signInWithPopup");
+            console.log("Using signInWithPopup for desktop");
             return signInWithPopup(auth, provider);
         }
     }
@@ -75,11 +78,14 @@ export function AuthProvider({ children }) {
         // Handle redirect result for mobile Google Sign-In
         const handleRedirectResult = async () => {
             try {
+                console.log("Checking for redirect result...");
                 const result = await getRedirectResult(auth);
+
                 if (result?.user) {
-                    console.log("Redirect sign-in successful:", result.user.email);
+                    console.log("✅ Redirect sign-in successful:", result.user.email);
                     // Sync with backend
                     try {
+                        console.log("Syncing with backend...");
                         const response = await fetch('https://backendcapstone-mhh2.onrender.com/api/users/social_login/', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -88,14 +94,23 @@ export function AuthProvider({ children }) {
                         if (response.ok) {
                             const data = await response.json();
                             localStorage.setItem('backend_token', data.token);
+                            console.log("✅ Backend sync successful, token stored");
                             await fetchUserRole();
+                        } else {
+                            console.error("❌ Backend sync failed:", response.status, await response.text());
                         }
                     } catch (err) {
-                        console.warn("Backend social sync failed:", err);
+                        console.error("❌ Backend social sync error:", err);
                     }
+                } else {
+                    console.log("No redirect result found (normal on initial page load)");
                 }
             } catch (error) {
-                console.error("Redirect result error:", error);
+                console.error("❌ Redirect result error:", error);
+                if (error.code) {
+                    console.error("Error code:", error.code);
+                    console.error("Error message:", error.message);
+                }
             }
         };
 
