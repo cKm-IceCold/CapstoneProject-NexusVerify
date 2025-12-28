@@ -24,17 +24,22 @@ function Register() {
     };
 
     const handleGoogleSignIn = async () => {
+        console.log("🔘 Google button clicked (Register)");
         try {
             setError('');
+            console.log("Calling googleSignIn()...");
             const result = await googleSignIn();
+            console.log("googleSignIn() returned:", result ? "result object" : "null/undefined");
 
             // For desktop (popup), result will be returned immediately
             // For mobile (redirect), result will be null and handled by AuthContext
             if (result?.user) {
+                console.log("✅ Got user from result:", result.user.email);
                 const user = result.user;
 
                 // Sync Google user with backend
                 try {
+                    console.log("Syncing with backend...");
                     const response = await fetch('https://backendcapstone-mhh2.onrender.com/api/users/social_login/', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -44,18 +49,25 @@ function Register() {
                         const data = await response.json();
                         localStorage.setItem('backend_token', data.token);
                         await fetchUserRole();
+                        console.log("✅ Backend sync complete");
                     }
                 } catch (err) {
                     console.warn("Backend social sync failed:", err);
                 }
 
                 navigate('/profile');
+            } else {
+                console.log("📱 No result returned - redirect flow initiated (mobile)");
             }
             // If result is null (mobile redirect), the redirect will happen automatically
         } catch (err) {
-            console.error(err);
+            console.error("❌ Google Sign-In error:", err);
+            console.error("Error code:", err.code);
+            console.error("Error message:", err.message);
             if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
                 setError("Sign-in cancelled. Please try again.");
+            } else if (err.code === 'auth/unauthorized-domain') {
+                setError("Domain not authorized. Please contact support.");
             } else {
                 setError("Google Sign-In failed: " + err.message);
             }
