@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/DjangoAuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import Logo from '../assets/nexus-verify.png';
 
@@ -7,87 +7,40 @@ function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const { login, googleSignIn, fetchUserRole } = useAuth();
+    const [loading, setLoading] = useState(false);
+    const { login, googleSignIn } = useAuth();
     const navigate = useNavigate();
 
     const handleGoogleSignIn = async () => {
-        console.log("🔘 Google button clicked");
         try {
             setError('');
-            console.log("Calling googleSignIn()...");
-            const result = await googleSignIn();
-            console.log("googleSignIn() returned:", result ? "result object" : "null/undefined");
-
-            // For desktop (popup), result will be returned immediately
-            // For mobile (redirect), result will be null and handled by AuthContext
-            if (result?.user) {
-                console.log("✅ Got user from result:", result.user.email);
-                const user = result.user;
-
-                // Sync Google user with backend
-                try {
-                    console.log("Syncing with backend...");
-                    const response = await fetch('https://backendcapstone-mhh2.onrender.com/api/users/social_login/', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email: user.email })
-                    });
-                    if (response.ok) {
-                        const data = await response.json();
-                        localStorage.setItem('backend_token', data.token);
-                        await fetchUserRole();
-                        console.log("✅ Backend sync complete");
-                    }
-                } catch (err) {
-                    console.warn("Backend social sync failed:", err);
-                }
-
-                navigate('/profile');
-            } else {
-                console.log("📱 No result returned - redirect flow initiated (mobile)");
-            }
-            // If result is null (mobile redirect), the redirect will happen automatically
+            setLoading(true);
+            await googleSignIn();
+            navigate('/profile');
         } catch (err) {
-            console.error("❌ Google Sign-In error:", err);
-            console.error("Error code:", err.code);
-            console.error("Error message:", err.message);
+            console.error("Google Sign-In error:", err);
             if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
                 setError("Sign-in cancelled. Please try again.");
-            } else if (err.code === 'auth/unauthorized-domain') {
-                setError("Domain not authorized. Please contact support.");
             } else {
                 setError("Google Sign-In failed: " + err.message);
             }
+        } finally {
+            setLoading(false);
         }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+        setLoading(true);
+
         try {
             await login(email, password);
-
-            // Sync with backend to get Token (Backend now supports Email as Username)
-            try {
-                const response = await fetch('https://backendcapstone-mhh2.onrender.com/api/token/', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: email, password: password })
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    localStorage.setItem('backend_token', data.token);
-                    await fetchUserRole();
-                } else {
-                    console.warn("Backend token exchange failed (credentials mismatch in Django).");
-                }
-            } catch (err) {
-                console.warn("Backend token exchange failed:", err);
-            }
-
             navigate('/profile');
         } catch (err) {
-            setError("Failed to log in: " + err.message);
+            setError(err.message || "Failed to log in");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -132,9 +85,10 @@ function Login() {
                     <div>
                         <button
                             type="submit"
-                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                            disabled={loading}
+                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:opacity-50"
                         >
-                            Sign in
+                            {loading ? 'Signing in...' : 'Sign in'}
                         </button>
                     </div>
 

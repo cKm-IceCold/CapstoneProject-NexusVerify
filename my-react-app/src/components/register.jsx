@@ -1,6 +1,7 @@
+```javascript
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/DjangoAuthContext';
 import Logo from '../assets/nexus-verify.png';
 
 function Register() {
@@ -13,7 +14,7 @@ function Register() {
     });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const { signup, googleSignIn, fetchUserRole } = useAuth();
+    const { signup, googleSignIn } = useAuth();
     const navigate = useNavigate();
 
     const handleChange = (e) => {
@@ -24,53 +25,20 @@ function Register() {
     };
 
     const handleGoogleSignIn = async () => {
-        console.log("🔘 Google button clicked (Register)");
         try {
             setError('');
-            console.log("Calling googleSignIn()...");
-            const result = await googleSignIn();
-            console.log("googleSignIn() returned:", result ? "result object" : "null/undefined");
-
-            // For desktop (popup), result will be returned immediately
-            // For mobile (redirect), result will be null and handled by AuthContext
-            if (result?.user) {
-                console.log("✅ Got user from result:", result.user.email);
-                const user = result.user;
-
-                // Sync Google user with backend
-                try {
-                    console.log("Syncing with backend...");
-                    const response = await fetch('https://backendcapstone-mhh2.onrender.com/api/users/social_login/', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email: user.email })
-                    });
-                    if (response.ok) {
-                        const data = await response.json();
-                        localStorage.setItem('backend_token', data.token);
-                        await fetchUserRole();
-                        console.log("✅ Backend sync complete");
-                    }
-                } catch (err) {
-                    console.warn("Backend social sync failed:", err);
-                }
-
-                navigate('/profile');
-            } else {
-                console.log("📱 No result returned - redirect flow initiated (mobile)");
-            }
-            // If result is null (mobile redirect), the redirect will happen automatically
+            setLoading(true);
+            await googleSignIn();
+            navigate('/profile');
         } catch (err) {
-            console.error("❌ Google Sign-In error:", err);
-            console.error("Error code:", err.code);
-            console.error("Error message:", err.message);
+            console.error("Google Sign-In error:", err);
             if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
                 setError("Sign-in cancelled. Please try again.");
-            } else if (err.code === 'auth/unauthorized-domain') {
-                setError("Domain not authorized. Please contact support.");
             } else {
                 setError("Google Sign-In failed: " + err.message);
             }
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -78,48 +46,24 @@ function Register() {
         e.preventDefault();
         setError('');
 
+        // Validation
         if (formData.password !== formData.confirmPassword) {
-            setError("Passwords do not match");
+            setError("Passwords don't match");
+            return;
+        }
+
+        if (formData.password.length < 6) {
+            setError("Password must be at least 6 characters");
             return;
         }
 
         setLoading(true);
+
         try {
-            // 1. Create User in Firebase
-            await signup(formData.email, formData.password);
-
-            // 2. Create User in Backend (to keep relational data sync)
-            try {
-                const response = await fetch('https://backendcapstone-mhh2.onrender.com/api/users/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        username: formData.username,
-                        email: formData.email,
-                        password: formData.password,
-                        role: formData.role
-                    }),
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    // If the backend returns a token, we should store it
-                    if (data.token) {
-                        localStorage.setItem('backend_token', data.token);
-                        await fetchUserRole(); // Sync role immediately
-                    }
-                } else {
-                    console.warn("Backend user creation failed, but Firebase auth succeeded.");
-                }
-            } catch (backendErr) {
-                console.warn("Backend unavailable:", backendErr);
-            }
-
+            await signup(formData.username, formData.email, formData.password, formData.role);
             navigate('/profile');
         } catch (err) {
-            setError('Failed to create an account: ' + err.message);
+            setError(err.message || "Failed to create account");
         } finally {
             setLoading(false);
         }

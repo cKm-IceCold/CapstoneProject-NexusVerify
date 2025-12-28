@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider } from './context/DjangoAuthContext';
 import Home from './components/Home';
 import HowItWorks from './components/how_it_works';
 import ListingsPage from './components/listings';
