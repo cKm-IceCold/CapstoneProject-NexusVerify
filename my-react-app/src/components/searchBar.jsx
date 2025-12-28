@@ -77,15 +77,25 @@ function SearchBar({ onSearchResult }) {
 
     // Validate Input
     if (!property) {
-      setStatus({ type: 'error', message: "Please select a property type." });
+      setStatus({ type: 'error', message: "Please select a property type first." });
       return;
     }
 
-    // Strict Location Check: Must match a slug in the list
-    const selectedLocObj = dynamicLocations.find(l => l.name.toLowerCase() === location.toLowerCase());
+    if (!location || location.trim() === '') {
+      setStatus({ type: 'error', message: "Please enter and select a location from the dropdown." });
+      return;
+    }
+
+    // Strict Location Check: Must match a slug in the list (with trimming and case-insensitive)
+    const selectedLocObj = dynamicLocations.find(l =>
+      l.name.toLowerCase().trim() === location.toLowerCase().trim()
+    );
 
     if (!selectedLocObj) {
-      setStatus({ type: 'error', message: "Please select a valid location from the dropdown." });
+      setStatus({
+        type: 'error',
+        message: `"${location}" is not in our database. Please click a location from the dropdown list.`
+      });
       return;
     }
 
@@ -176,7 +186,13 @@ function SearchBar({ onSearchResult }) {
           <input
             type="text"
             className="p-4 text-sm placeholder-gray-500 border-b md:border-b-0 md:border-r border-gray-100 focus:outline-none w-full"
-            placeholder={property ? "Choose area in Lagos" : "Select property first"}
+            placeholder={
+              !property
+                ? "Select property type first"
+                : dynamicLocations.length === 0
+                  ? "Loading locations..."
+                  : "Type to search Lagos areas"
+            }
             value={location}
             onChange={(e) => { setLocation(e.target.value); setShowLocDropdown(true); }}
             onFocus={() => setShowLocDropdown(true)}
