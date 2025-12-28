@@ -1,13 +1,4 @@
 import React, { useContext, useState, useEffect } from "react";
-import { auth } from "../firebase/firebase";
-import {
-    signOut as firebaseSignOut,
-    onAuthStateChanged,
-    GoogleAuthProvider,
-    signInWithPopup,
-    signInWithRedirect,
-    getRedirectResult
-} from "firebase/auth";
 
 const AuthContext = React.createContext();
 
@@ -76,55 +67,11 @@ export function AuthProvider({ children }) {
         }
     }
 
-    // Logout (clear token and Firebase if Google was used)
+    // Logout - clear Django token
     async function logout() {
-        try {
-            // If user signed in with Google, sign out from Firebase too
-            if (auth.currentUser) {
-                await firebaseSignOut(auth);
-            }
-        } catch (err) {
-            console.log("Firebase sign out skipped:", err);
-        }
-
-        // Clear Django token
         localStorage.removeItem('backend_token');
         setCurrentUser(null);
         setUserRole(null);
-    }
-
-    // Google Sign-In (uses Firebase popup, then syncs with Django)
-    async function googleSignIn() {
-        const provider = new GoogleAuthProvider();
-
-        // Force popup mode for all devices to avoid redirect timeout
-        const isMobile = false;
-
-        console.log("🔐 Starting Google Sign-In...");
-
-        try {
-            const result = await signInWithPopup(auth, provider);
-
-            if (result?.user) {
-                // Sync with Django backend
-                const response = await fetch(`${API_BASE}/users/social_login/`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: result.user.email })
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    localStorage.setItem('backend_token', data.token);
-                    setCurrentUser({ email: data.email, username: data.username });
-                    setUserRole(data.role);
-                }
-            }
-
-            return result;
-        } catch (error) {
-            throw error;
-        }
     }
 
     // Fetch user profile from Django
@@ -169,7 +116,6 @@ export function AuthProvider({ children }) {
         login,
         signup,
         logout,
-        googleSignIn,
         fetchUserRole: fetchUserProfile
     };
 
