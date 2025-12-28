@@ -40,12 +40,14 @@ export function AuthProvider({ children }) {
     function googleSignIn() {
         const provider = new GoogleAuthProvider();
 
-        // Detect if user is on mobile device
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        // Temporarily force popup mode for ALL devices to bypass redirect timeout issue
+        // The redirect is timing out because Firebase Hosting isn't configured
+        const isMobile = false; // /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
         console.log("🔐 Starting Google Sign-In...");
         console.log("📱 Device type:", isMobile ? "Mobile" : "Desktop");
         console.log("🌐 User Agent:", navigator.userAgent);
+        console.log("⚠️ FORCING POPUP MODE to bypass redirect timeout");
 
         if (isMobile) {
             console.log("Using signInWithRedirect for mobile");
