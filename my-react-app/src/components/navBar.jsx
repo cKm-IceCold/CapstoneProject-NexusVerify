@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/DjangoAuthContext';
 import Logo from '../assets/nexus-verify.png';
 import verify from '../assets/Group.png';
 import loginIcon from '../assets/login.png';
