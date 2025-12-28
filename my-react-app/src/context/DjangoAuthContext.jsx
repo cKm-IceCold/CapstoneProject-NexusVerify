@@ -16,18 +16,36 @@ export function AuthProvider({ children }) {
     // Django email/password signup
     async function signup(username, email, password, role = 'CUSTOMER') {
         try {
+            console.log("Attempting signup:", { username, email, role });
+
             const response = await fetch(`${API_BASE}/users/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, email, password, role })
             });
 
+            console.log("Signup response status:", response.status);
+
             if (!response.ok) {
                 const error = await response.json();
-                throw new Error(error.email ? error.email[0] : 'Registration failed');
+                console.error("Django error response:", error);
+
+                // Handle different error types
+                if (error.email) {
+                    throw new Error(error.email[0]);
+                } else if (error.username) {
+                    throw new Error(error.username[0]);
+                } else if (error.password) {
+                    throw new Error(error.password[0]);
+                } else if (error.detail) {
+                    throw new Error(error.detail);
+                } else {
+                    throw new Error(JSON.stringify(error));
+                }
             }
 
             const data = await response.json();
+            console.log("Signup successful:", data);
 
             // Store token and set user
             if (data.token) {
@@ -38,6 +56,7 @@ export function AuthProvider({ children }) {
 
             return data;
         } catch (error) {
+            console.error("Signup error:", error);
             throw error;
         }
     }
