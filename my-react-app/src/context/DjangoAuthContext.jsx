@@ -64,17 +64,31 @@ export function AuthProvider({ children }) {
     // Django email/password login
     async function login(email, password) {
         try {
+            console.log("Attempting login with:", { email });
+
             const response = await fetch(`${API_BASE}/token/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username: email, password })
             });
 
+            console.log("Login response status:", response.status);
+
             if (!response.ok) {
-                throw new Error('Invalid email or password');
+                const error = await response.json();
+                console.error("Django login error:", error);
+
+                if (error.non_field_errors) {
+                    throw new Error(error.non_field_errors[0]);
+                } else if (error.detail) {
+                    throw new Error(error.detail);
+                } else {
+                    throw new Error('Invalid email or password');
+                }
             }
 
             const data = await response.json();
+            console.log("Login successful, token received");
             localStorage.setItem('backend_token', data.token);
 
             // Fetch user details
@@ -82,6 +96,7 @@ export function AuthProvider({ children }) {
 
             return data;
         } catch (error) {
+            console.error("Login error:", error);
             throw error;
         }
     }
