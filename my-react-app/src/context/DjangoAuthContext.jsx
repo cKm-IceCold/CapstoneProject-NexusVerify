@@ -16,44 +16,23 @@ export function AuthProvider({ children }) {
     // Django email/password signup
     async function signup(username, email, password, role = 'CUSTOMER') {
         try {
-            console.log("Attempting signup:", { username, email, role });
-
             const response = await fetch(`${API_BASE}/users/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, email, password, role })
             });
 
-            console.log("Signup response status:", response.status);
-
             if (!response.ok) {
                 const error = await response.json();
-                console.error("Django error response:", error);
-
-                // Handle different error types
-                if (error.email) {
-                    throw new Error(error.email[0]);
-                } else if (error.username) {
-                    throw new Error(error.username[0]);
-                } else if (error.password) {
-                    throw new Error(error.password[0]);
-                } else if (error.detail) {
-                    throw new Error(error.detail);
-                } else {
-                    throw new Error(JSON.stringify(error));
-                }
+                throw new Error(error.email?.[0] || error.username?.[0] || "Signup failed");
             }
 
             const data = await response.json();
-            console.log("Signup successful:", data);
-
-            // Store token and set user
             if (data.token) {
                 localStorage.setItem('backend_token', data.token);
                 setCurrentUser({ email: data.email, username: data.username });
                 setUserRole(data.role);
             }
-
             return data;
         } catch (error) {
             console.error("Signup error:", error);
@@ -61,38 +40,35 @@ export function AuthProvider({ children }) {
         }
     }
 
-    // Django email/password login
+    // FIXED LOGIN FUNCTION
     async function login(email, password) {
         try {
-            console.log("Attempting login with:", { email });
+            console.log("Attempting login with:", email);
 
-            const response = await fetch(`${API_BASE}/token/`, {
+            const response = await fetch(`${API_BASE}/users/login/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username: email, password })
+                // Sending 'email' key to match the backend request.data.get('email')
+                body: JSON.stringify({ email, password }) 
             });
-
-            console.log("Login response status:", response.status);
 
             if (!response.ok) {
                 const error = await response.json();
-                console.error("Django login error:", error);
-
-                if (error.non_field_errors) {
-                    throw new Error(error.non_field_errors[0]);
-                } else if (error.detail) {
-                    throw new Error(error.detail);
-                } else {
-                    throw new Error('Invalid email or password');
-                }
+                // Check for different error formats
+                const errorMessage = error.non_field_errors?.[0] || error.error || 'Invalid email or password';
+                throw new Error(errorMessage);
             }
 
             const data = await response.json();
-            console.log("Login successful, token received");
             localStorage.setItem('backend_token', data.token);
 
-            // Fetch user details
-            await fetchUserProfile();
+            // Set user data directly from login response
+            if (data.user) {
+                setCurrentUser({ email: data.user.email, username: data.user.username });
+                setUserRole(data.user.role);
+            } else {
+                await fetchUserProfile();
+            }
 
             return data;
         } catch (error) {
@@ -101,14 +77,12 @@ export function AuthProvider({ children }) {
         }
     }
 
-    // Logout - clear Django token
     async function logout() {
         localStorage.removeItem('backend_token');
         setCurrentUser(null);
         setUserRole(null);
     }
 
-    // Fetch user profile from Django
     const fetchUserProfile = async () => {
         const token = localStorage.getItem('backend_token');
         if (!token) {
@@ -126,32 +100,21 @@ export function AuthProvider({ children }) {
                 setCurrentUser({ email: data.email, username: data.username });
                 setUserRole(data.role);
             } else {
-                // Invalid token, clear it
                 localStorage.removeItem('backend_token');
                 setCurrentUser(null);
-                setUserRole(null);
             }
         } catch (err) {
             console.error("Failed to fetch profile:", err);
-            localStorage.removeItem('backend_token');
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        // Check for existing token on mount
         fetchUserProfile();
     }, []);
 
-    const value = {
-        currentUser,
-        userRole,
-        login,
-        signup,
-        logout,
-        fetchUserRole: fetchUserProfile
-    };
+    const value = { currentUser, userRole, login, signup, logout };
 
     return (
         <AuthContext.Provider value={value}>
